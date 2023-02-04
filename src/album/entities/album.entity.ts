@@ -10,6 +10,7 @@ export class Album {
   @ApiProperty({ description: 'Album relase year', nullable: false })
   year: number;
   @ApiProperty({ description: 'Album author', nullable: false })
+  @IsUUID('4')
   artistId: string | null;
 
   constructor(id: string, name: string, year: number, artistId: string | null) {

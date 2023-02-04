@@ -59,7 +59,9 @@ export class ArtistService {
     }
 
     if (updateArtistDto.name) artist.name = updateArtistDto.name;
-    if (updateArtistDto.grammy) artist.grammy = updateArtistDto.grammy;
+    if (updateArtistDto.grammy != undefined) {
+      artist.grammy = updateArtistDto.grammy;
+    }
 
     return artist;
   }
@@ -72,7 +74,7 @@ export class ArtistService {
     }
 
     this.albumService.clearArtistId(id);
-    this.trackService.clearAlbumId(id);
+    this.trackService.clearArtistId(id);
     this.favoritesService.removeArtist(id);
 
     this._artists.splice(index, 1);
