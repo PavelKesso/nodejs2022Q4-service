@@ -3,13 +3,10 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   ParseUUIDPipe,
   HttpCode,
-  UseInterceptors,
-  ClassSerializerInterceptor,
   Put,
 } from '@nestjs/common';
 import { TrackService } from './track.service';
