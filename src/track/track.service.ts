@@ -1,6 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { NotFoundError } from 'rxjs';
-import { UpdateFavoriteDto } from 'src/favorites/dto/update-favorite.dto';
 import { v4 } from 'uuid';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
@@ -65,5 +63,21 @@ export class TrackService {
     this._tracks.splice(index, 1);
 
     return;
+  }
+
+  clearArtistId(id: string) {
+    const tracks = this._tracks.filter((track) => track.artistId === id);
+
+    tracks.forEach((track) => {
+      track.artistId = null;
+    });
+  }
+
+  clearAlbumId(id: string) {
+    const tracks = this._tracks.filter((track) => track.albumId === id);
+
+    tracks.forEach((track) => {
+      track.albumId = null;
+    });
   }
 }
