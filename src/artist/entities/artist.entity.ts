@@ -1,7 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsUUID } from 'class-validator';
 
 export class Artist {
   @ApiProperty({ description: 'Artist identifier', nullable: false })
+  @IsUUID('4')
   id: string;
   @ApiProperty({ description: 'Artist name', nullable: false })
   name: string;

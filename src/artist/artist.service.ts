@@ -1,4 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { AlbumService } from 'src/album/album.service';
+import { FavoritesService } from 'src/favorites/favorites.service';
+import { TrackService } from 'src/track/track.service';
 import { v4 } from 'uuid';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
@@ -8,10 +16,24 @@ import { Artist } from './entities/artist.entity';
 export class ArtistService {
   private _artists: Artist[] = [];
 
+  @Inject(TrackService)
+  public trackService: TrackService;
+
+  @Inject(AlbumService)
+  public albumService: AlbumService;
+
+  @Inject(forwardRef(() => FavoritesService))
+  public favoritesService: FavoritesService;
+
   create(createArtistDto: CreateArtistDto) {
-    const id = v4();
-    const artist = new Artist(id, createArtistDto.name, createArtistDto.grammy);
+    const artist = new Artist(
+      v4(),
+      createArtistDto.name,
+      createArtistDto.grammy,
+    );
+
     this._artists.push(artist);
+
     return artist;
   }
 
@@ -20,25 +42,41 @@ export class ArtistService {
   }
 
   findOne(id: string) {
-    return this._artists.filter((artist) => artist.id == id);
+    const artist = this._artists.find((artist) => artist.id === id);
+
+    if (!artist) {
+      throw new NotFoundException();
+    }
+
+    return artist;
   }
 
   update(id: string, updateArtistDto: UpdateArtistDto) {
     const artist = this._artists.find((artist) => artist.id == id);
 
     if (!artist) {
-      return;
+      throw new NotFoundException();
     }
 
-    const { name, grammy } = updateArtistDto;
-
-    artist.name = name;
-    artist.grammy = grammy;
+    if (updateArtistDto.name) artist.name = updateArtistDto.name;
+    if (updateArtistDto.grammy) artist.grammy = updateArtistDto.grammy;
 
     return artist;
   }
 
   remove(id: string) {
-    this._artists = this._artists.filter((artist) => artist.id == id);
+    const index = this._artists.findIndex((artist) => artist.id === id);
+
+    if (index === -1) {
+      throw new NotFoundException();
+    }
+
+    this.albumService.clearArtistId(id);
+    this.trackService.clearAlbumId(id);
+    this.favoritesService.removeArtist(id);
+
+    this._artists.splice(index, 1);
+
+    return;
   }
 }
