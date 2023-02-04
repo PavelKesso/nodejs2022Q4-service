@@ -10,6 +10,7 @@ import {
   HttpCode,
   UseInterceptors,
   ClassSerializerInterceptor,
+  Put,
 } from '@nestjs/common';
 import { TrackService } from './track.service';
 import { CreateTrackDto } from './dto/create-track.dto';
@@ -34,7 +35,7 @@ export class TrackController {
     return this.trackService.findOne(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateTrackDto: UpdateTrackDto,
