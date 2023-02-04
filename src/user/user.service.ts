@@ -38,9 +38,9 @@ export class UserService {
 
     if (!user) {
       throw new NotFoundException();
-    } else {
-      return user;
     }
+
+    return user;
   }
 
   update(id: string, updateUserPasswordDto: UpdatePasswordDto) {
