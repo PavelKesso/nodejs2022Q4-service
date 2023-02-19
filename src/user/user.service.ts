@@ -3,48 +3,33 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { v4 } from 'uuid';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
+  @InjectRepository(User) private readonly userRepository: Repository<User>;
+
   private _users: User[] = [];
 
   create(createUserDto: CreateUserDto) {
-    const now = new Date().getTime();
-
-    const user = new User(
-      v4(),
-      createUserDto.login,
-      createUserDto.password,
-      1,
-      now,
-      now,
-    );
-
-    this._users.push(user);
-
-    return user;
+    const newUser = this.userRepository.create(createUserDto);
+    return this.userRepository.save(newUser);
   }
 
   findAll() {
-    return this._users;
+    return this.userRepository.find();
   }
 
   findOne(id: string) {
-    const user = this._users.find((user) => user.id === id);
-
-    if (!user) {
-      throw new NotFoundException();
-    }
-
-    return user;
+    return this.userRepository.findOneOrFail({ where: { id: id } });
   }
 
-  update(id: string, updateUserPasswordDto: UpdatePasswordDto) {
-    const user = this._users.find((user) => user.id === id);
+  async update(id: string, updateUserPasswordDto: UpdatePasswordDto) {
+    const user = await this.userRepository.findOneOrFail({ where: { id: id } });
 
     if (!user) {
       throw new NotFoundException();
@@ -58,18 +43,17 @@ export class UserService {
     user.version++;
     user.updatedAt = new Date().getTime();
 
+    this.userRepository.save(user);
     return user;
   }
 
-  remove(id: string) {
-    const index = this._users.findIndex((user) => user.id === id);
+  async remove(id: string) {
+    const user = await this.userRepository.findOneOrFail({ where: { id: id } });
 
-    if (index === -1) {
+    if (!user) {
       throw new NotFoundException();
     }
 
-    this._users.splice(index, 1);
-
-    return;
+    return this.userRepository.delete(id);
   }
 }
