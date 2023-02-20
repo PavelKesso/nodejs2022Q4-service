@@ -1,10 +1,11 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityNotFoundError, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -24,12 +25,18 @@ export class UserService {
     return this.userRepository.find();
   }
 
-  findOne(id: string) {
-    return this.userRepository.findOneOrFail({ where: { id: id } });
+  async findOne(id: string) {
+    const user = await this.userRepository.findOne({ where: { id: id } });
+
+    if (!user) {
+      throw new NotFoundException();
+    }
+
+    return user;
   }
 
   async update(id: string, updateUserPasswordDto: UpdatePasswordDto) {
-    const user = await this.userRepository.findOneOrFail({ where: { id: id } });
+    const user = await this.userRepository.findOne({ where: { id: id } });
 
     if (!user) {
       throw new NotFoundException();
@@ -39,16 +46,16 @@ export class UserService {
       throw new ForbiddenException();
     }
 
-    user.password = updateUserPasswordDto.newPassword;
-    user.version++;
-    user.updatedAt = new Date().getTime();
+    await this.userRepository.update(id, {
+      password: updateUserPasswordDto.newPassword,
+      version: user.version + 1,
+    });
 
-    this.userRepository.save(user);
-    return user;
+    return this.userRepository.findOne({ where: { id: id } });
   }
 
   async remove(id: string) {
-    const user = await this.userRepository.findOneOrFail({ where: { id: id } });
+    const user = await this.userRepository.findOne({ where: { id: id } });
 
     if (!user) {
       throw new NotFoundException();
