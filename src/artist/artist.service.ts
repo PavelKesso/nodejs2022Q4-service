@@ -10,8 +10,8 @@ export class ArtistService {
   @InjectRepository(Artist) private readonly repository: Repository<Artist>;
 
   create(createArtistDto: CreateArtistDto) {
-    const newUser = this.repository.create(createArtistDto);
-    return this.repository.save(newUser);
+    const newArtist = this.repository.create(createArtistDto);
+    return this.repository.save(newArtist);
   }
 
   findAll() {
