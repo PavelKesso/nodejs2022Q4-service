@@ -1,11 +1,10 @@
 import {
-  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityNotFoundError, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -13,8 +12,6 @@ import { User } from './entities/user.entity';
 @Injectable()
 export class UserService {
   @InjectRepository(User) private readonly userRepository: Repository<User>;
-
-  private _users: User[] = [];
 
   create(createUserDto: CreateUserDto) {
     const newUser = this.userRepository.create(createUserDto);
