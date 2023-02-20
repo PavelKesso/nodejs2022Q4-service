@@ -1,4 +1,3 @@
-import { Artist } from 'src/artist/entities/artist.entity';
 import {
   Column,
   Entity,
@@ -7,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Album } from './album.entity';
+import { Artist } from './artist.entity';
 
 @Entity()
 export class Track {

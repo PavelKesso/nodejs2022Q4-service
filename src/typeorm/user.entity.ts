@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Generated,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -9,10 +10,10 @@ import {
 @Entity()
 export class User {
   @PrimaryGeneratedColumn({
-    type: 'bigint',
     name: 'user_id',
   })
-  id: number;
+  @Generated('uuid')
+  id: string;
 
   @Column({
     nullable: false,
@@ -28,7 +29,7 @@ export class User {
 
   @Column({
     nullable: false,
-    default: '',
+    default: 1,
   })
   version: number;
 
